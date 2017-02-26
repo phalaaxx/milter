@@ -124,6 +124,9 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 		// convert address and port to human readable string
 		var network, address string
 		switch ProtocolFamily {
+		case 'U':
+			network = "unknown"
+			address = Address
 		case 'L':
 			network = "unix"
 			address = Address
