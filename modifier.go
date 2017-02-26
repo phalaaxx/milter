@@ -8,7 +8,8 @@ import (
 	"net/textproto"
 )
 
-/* Modifier represents incoming milter command */
+/* Modifier provides access to Macros, Headers and Body data to callback handlers. It also defines a
+   number of functions that can be used by callback handlers to modify processing of the email message */
 type Modifier struct {
 	Macros      map[string]string
 	Headers     textproto.MIMEHeader
@@ -16,13 +17,13 @@ type Modifier struct {
 	WritePacket func(*Message) error
 }
 
-/* AddRecipient appends a new recipient for current message */
+/* AddRecipient appends a new envelope recipient for current message */
 func (m *Modifier) AddRecipient(r string) error {
 	data := []byte(fmt.Sprintf("<%s>", r))
 	return m.WritePacket(NewResponse('+', data).Response())
 }
 
-/* DeleteRecipient removes a recipient address from message */
+/* DeleteRecipient removes an envelope recipient address from message */
 func (m *Modifier) DeleteRecipient(r string) error {
 	data := []byte(fmt.Sprintf("<%s>", r))
 	return m.WritePacket(NewResponse('-', data).Response())
@@ -33,13 +34,13 @@ func (m *Modifier) ReplaceBody(body []byte) error {
 	return m.WritePacket(NewResponse('b', body).Response())
 }
 
-/* AddHeader appends a new email message header to response message */
+/* AddHeader appends a new email message header the message */
 func (m *Modifier) AddHeader(name, value string) error {
 	data := EncodeCStrings([]string{name, value})
 	return m.WritePacket(NewResponse('h', data).Response())
 }
 
-/* ChangeHeader replaces the header at the position specified position with a new one */
+/* ChangeHeader replaces the header at the pecified position with a new one */
 func (m *Modifier) ChangeHeader(index int, name, value string) error {
 	buffer := new(bytes.Buffer)
 	// encode header index in the beginning
@@ -55,7 +56,7 @@ func (m *Modifier) ChangeHeader(index int, name, value string) error {
 	return m.WritePacket(NewResponse('m', buffer.Bytes()).Response())
 }
 
-/* NewModifier creates a new Modifier object */
+/* NewModifier creates a new Modifier object from MilterSession */
 func NewModifier(s *MilterSession) *Modifier {
 	return &Modifier{
 		Macros:      s.Macros,

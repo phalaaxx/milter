@@ -1,4 +1,3 @@
-/* milter session */
 package milter
 
 import (
@@ -31,7 +30,7 @@ const (
 	NoEOH      = 0x40
 )
 
-/* Milter represents incoming milter command */
+/* MilterSession is keeps session state during MTA communication */
 type MilterSession struct {
 	Actions  uint32
 	Protocol uint32
@@ -93,7 +92,7 @@ func (m *MilterSession) WritePacket(msg *Message) error {
 	return nil
 }
 
-/* Process milter message / command */
+/* Process incoming milter command */
 func (m *MilterSession) Process(msg *Message) (Response, error) {
 	switch msg.Code {
 	case 'A':

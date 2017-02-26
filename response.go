@@ -1,6 +1,7 @@
 package milter
 
-/* Response represents commant sent from milter client */
+/* Response represents a response structure returned by callback
+   handlers to indicate how the milter server should proceed */
 type Response interface {
 	Response() *Message
 	Continue() bool
@@ -28,7 +29,7 @@ const (
 	RespTempFail = SimpleResponse(TempFail)
 )
 
-/* CustomResponse is a response object used to send data back to MTA */
+/* CustomResponse is a response object used by callback handlers to indicate how the milter should continue processing of current message */
 type CustomResponse struct {
 	Code byte
 	Data []byte

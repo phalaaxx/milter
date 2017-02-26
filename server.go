@@ -1,11 +1,10 @@
-/* RunServer provides a convinient way to start milter server main loop */
 package milter
 
 import (
 	"net"
 )
 
-/* Run server listener */
+/* RunServer provides a convinient way to start milter server */
 func RunServer(server net.Listener, MilterInit func() (Milter, uint32, uint32)) error {
 	for {
 		// accept connection from client
