@@ -169,9 +169,9 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 		HeaderData := DecodeCStrings(msg.Data)
 		if len(HeaderData) == 2 {
 			m.Headers.Add(HeaderData[0], HeaderData[1])
+			// call and return milter handler
+			return m.Milter.Header(HeaderData[0], HeaderData[1], NewModifier(m))
 		}
-		// call and return milter handler
-		return m.Milter.Header(HeaderData[0], HeaderData[1], NewModifier(m))
 
 	case 'M':
 		// envelope from address
