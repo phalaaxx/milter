@@ -122,23 +122,23 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 		// get address
 		Address := ReadCString(msg.Data)
 		// convert address and port to human readable string
-		var network, address string
+		var family, address string
 		switch ProtocolFamily {
 		case 'U':
-			network = "unknown"
+			family = "unknown"
 			address = Address
 		case 'L':
-			network = "unix"
+			family = "unix"
 			address = Address
 		case '4':
-			network = "tcp4"
+			family = "tcp4"
 			address = fmt.Sprintf("%s:%d", Address, Port)
 		case '6':
-			network = "tcp6"
+			family = "tcp6"
 			address = fmt.Sprintf("[%s]:%d", Address, Port)
 		}
 		// run handler and return
-		return m.Milter.Connect(Hostname, network, address, NewModifier(m))
+		return m.Milter.Connect(Hostname, family, address, NewModifier(m))
 
 	case 'D':
 		// define macros
