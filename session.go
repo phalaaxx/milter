@@ -5,9 +5,9 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/textproto"
 	"strings"
 )
@@ -122,23 +122,19 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 		// get address
 		Address := ReadCString(msg.Data)
 		// convert address and port to human readable string
-		var family, address string
-		switch ProtocolFamily {
-		case 'U':
-			family = "unknown"
-			address = Address
-		case 'L':
-			family = "unix"
-			address = Address
-		case '4':
-			family = "tcp4"
-			address = fmt.Sprintf("%s:%d", Address, Port)
-		case '6':
-			family = "tcp6"
-			address = fmt.Sprintf("[%s]:%d", Address, Port)
+		family := map[byte]string{
+			'U': "unknown",
+			'L': "unix",
+			'4': "tcp4",
+			'6': "tcp6",
 		}
 		// run handler and return
-		return m.Milter.Connect(Hostname, family, address, NewModifier(m))
+		return m.Milter.Connect(
+			Hostname,
+			family[ProtocolFamily],
+			Port,
+			net.ParseIP(Address),
+			NewModifier(m))
 
 	case 'D':
 		// define macros
