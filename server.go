@@ -4,8 +4,11 @@ import (
 	"net"
 )
 
+/* MilterInit is a function that initializes milter object options */
+type MilterInit func() (Milter, uint32, uint32)
+
 /* RunServer provides a convinient way to start milter server */
-func RunServer(server net.Listener, MilterInit func() (Milter, uint32, uint32)) error {
+func RunServer(server net.Listener, init MilterInit) error {
 	for {
 		// accept connection from client
 		client, err := server.Accept()
@@ -13,7 +16,7 @@ func RunServer(server net.Listener, MilterInit func() (Milter, uint32, uint32)) 
 			return err
 		}
 		// create milter object
-		milter, actions, protocol := MilterInit()
+		milter, actions, protocol := init()
 		session := MilterSession{
 			Actions:  actions,
 			Protocol: protocol,
