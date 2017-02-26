@@ -37,5 +37,5 @@ type Milter interface {
 
 	// Body is called when entire message body has been passed to milter
 	//   supress with NoBody
-	Body([]byte, *Modifier) (Response, error)
+	Body(*Modifier) (Response, error)
 }

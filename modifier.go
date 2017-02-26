@@ -13,7 +13,6 @@ import (
 type Modifier struct {
 	Macros      map[string]string
 	Headers     textproto.MIMEHeader
-	Body        []byte
 	WritePacket func(*Message) error
 }
 
@@ -61,7 +60,6 @@ func NewModifier(s *MilterSession) *Modifier {
 	return &Modifier{
 		Macros:      s.Macros,
 		Headers:     s.Headers,
-		Body:        s.Body,
 		WritePacket: s.WritePacket,
 	}
 }

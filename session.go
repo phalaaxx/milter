@@ -37,7 +37,6 @@ type MilterSession struct {
 	Sock     io.ReadWriteCloser
 	Headers  textproto.MIMEHeader
 	Macros   map[string]string
-	Body     []byte
 	Milter   Milter
 }
 
@@ -98,14 +97,12 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 	case 'A':
 		// abort current message and start over
 		m.Headers = nil
-		m.Body = nil
 		m.Macros = nil
 		// do not send response
 		return nil, nil
 
 	case 'B':
-		// body chunk, store data in buffer
-		m.Body = append(m.Body, msg.Data...)
+		// body chunk
 		return m.Milter.BodyChunk(msg.Data, NewModifier(m))
 
 	case 'C':
@@ -151,7 +148,7 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 
 	case 'E':
 		// call and return milter handler
-		return m.Milter.Body(m.Body, NewModifier(m))
+		return m.Milter.Body(NewModifier(m))
 
 	case 'H':
 		// helo command
