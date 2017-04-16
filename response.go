@@ -54,3 +54,8 @@ func (c *CustomResponse) Continue() bool {
 func NewResponse(code byte, data []byte) *CustomResponse {
 	return &CustomResponse{code, data}
 }
+
+/* NewResponseStr generates a new CustomResponse with string payload */
+func NewResponseStr(code byte, data string) *CustomResponse {
+	return NewResponse(code, EncodeCStrings([]string{data}))
+}
