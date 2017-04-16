@@ -35,13 +35,13 @@ func (m *Modifier) ReplaceBody(body []byte) error {
 
 /* AddHeader appends a new email message header the message */
 func (m *Modifier) AddHeader(name, value string) error {
-	data := EncodeCStrings([]string{name, value})
+	data := []byte(name + NULL + value + NULL)
 	return m.WritePacket(NewResponse('h', data).Response())
 }
 
 /* Quarantine a message by giving a reason to hold it */
 func (m *Modifier) Quarantine(reason string) error {
-	return m.WritePacket(NewResponse('q', []byte(reason + NULL)).Response())
+	return m.WritePacket(NewResponse('q', []byte(reason+NULL)).Response())
 }
 
 /* ChangeHeader replaces the header at the pecified position with a new one */
@@ -52,8 +52,8 @@ func (m *Modifier) ChangeHeader(index int, name, value string) error {
 		return err
 	}
 	// add header name and value to buffer
-	data := []string{name, value}
-	if _, err := buffer.Write(EncodeCStrings(data)); err != nil {
+	data := []byte(name + NULL + value + NULL)
+	if _, err := buffer.Write(data); err != nil {
 		return err
 	}
 	// prepare and send response packet
