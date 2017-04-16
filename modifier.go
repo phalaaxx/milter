@@ -39,8 +39,9 @@ func (m *Modifier) AddHeader(name, value string) error {
 	return m.WritePacket(NewResponse('h', data).Response())
 }
 
-func (m *Modifier) Quarantine(reason []byte) error {
-	return m.WritePacket(NewResponse('q', reason).Response())
+/* Quarantine a message by giving a reason to hold it */
+func (m *Modifier) Quarantine(reason string) error {
+	return m.WritePacket(NewResponse('q', []byte(reason)).Response())
 }
 
 /* ChangeHeader replaces the header at the pecified position with a new one */
