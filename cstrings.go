@@ -13,7 +13,6 @@ func DecodeCStrings(data []byte) []string {
 	if len(data) == 0 {
 		return nil
 	}
-
 	return strings.Split(strings.Trim(string(data), NULL), NULL)
 }
 
