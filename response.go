@@ -57,5 +57,5 @@ func NewResponse(code byte, data []byte) *CustomResponse {
 
 /* NewResponseStr generates a new CustomResponse with string payload */
 func NewResponseStr(code byte, data string) *CustomResponse {
-	return NewResponse(code, EncodeCStrings([]string{data}))
+	return NewResponse(code, []byte(data+NULL))
 }
