@@ -17,7 +17,7 @@ func DecodeCStrings(data []byte) []string {
 	return strings.Split(strings.Trim(string(data), NULL), NULL)
 }
 
-/* ENcodeCStrings encodes golang strings from slice into a list of null terminated strings */
+/* EncodeCStrings encodes golang strings from slice into a list of null terminated strings */
 func EncodeCStrings(data []string) []byte {
 	return []byte(strings.Join(data, NULL) + NULL)
 }
