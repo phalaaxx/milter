@@ -39,6 +39,10 @@ func (m *Modifier) AddHeader(name, value string) error {
 	return m.WritePacket(NewResponse('h', data).Response())
 }
 
+func (m *Modifier) Quarantine(reason []byte) error {
+	return m.WritePacket(NewResponse('q', reason).Response())
+}
+
 /* ChangeHeader replaces the header at the pecified position with a new one */
 func (m *Modifier) ChangeHeader(index int, name, value string) error {
 	buffer := new(bytes.Buffer)

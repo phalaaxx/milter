@@ -22,12 +22,11 @@ func (r SimpleResponse) Continue() bool {
 
 /* Define standard responses with no data */
 const (
-	RespAccept     = SimpleResponse(Accept)
-	RespContinue   = SimpleResponse(Continue)
-	RespDiscard    = SimpleResponse(Discard)
-	RespReject     = SimpleResponse(Reject)
-	RespTempFail   = SimpleResponse(TempFail)
-	RespQuarantine = SimpleResponse(Quarantine)
+	RespAccept   = SimpleResponse(Accept)
+	RespContinue = SimpleResponse(Continue)
+	RespDiscard  = SimpleResponse(Discard)
+	RespReject   = SimpleResponse(Reject)
+	RespTempFail = SimpleResponse(TempFail)
 )
 
 /* CustomResponse is a response object used by callback handlers to indicate how the milter should continue processing of current message */
