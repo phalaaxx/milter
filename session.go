@@ -170,7 +170,7 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 
 	case 'M':
 		// envelope from address
-		envfrom := string(msg.Data[0 : len(msg.Data)-1])
+		envfrom := ReadCString(msg.Data)
 		return m.Milter.MailFrom(strings.Trim(envfrom, "<>"), NewModifier(m))
 
 	case 'N':
@@ -195,7 +195,7 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 
 	case 'R':
 		// envelope to address
-		envto := string(msg.Data[0 : len(msg.Data)-1])
+		envto := ReadCString(msg.Data)
 		return m.Milter.RcptTo(strings.Trim(envto, "<>"), NewModifier(m))
 
 	case 'T':
