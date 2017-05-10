@@ -137,7 +137,7 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 		m.Macros = make(map[string]string)
 		// convert data to golang strings
 		data := DecodeCStrings(msg.Data[1:])
-		if len(data) == 0 {
+		if len(data) != 0 {
 			// store data in a map
 			for i := 0; i < len(data); i += 2 {
 				m.Macros[data[i]] = data[i+1]
