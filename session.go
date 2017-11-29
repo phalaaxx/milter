@@ -113,7 +113,13 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 		ProtocolFamily := msg.Data[0]
 		msg.Data = msg.Data[1:]
 		// get port
-		Port := binary.BigEndian.Uint16(msg.Data)
+		var Port uint16
+		if ProtocolFamily == '4' || ProtocolFamily == '6' {
+			if len(msg.Data) < 2 {
+				return RespTempFail, nil
+			}
+			Port = binary.BigEndian.Uint16(msg.Data)
+		}
 		msg.Data = msg.Data[2:]
 		// get address
 		Address := ReadCString(msg.Data)
