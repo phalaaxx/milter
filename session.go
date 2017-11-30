@@ -119,8 +119,8 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 				return RespTempFail, nil
 			}
 			Port = binary.BigEndian.Uint16(msg.Data)
+			msg.Data = msg.Data[2:]
 		}
-		msg.Data = msg.Data[2:]
 		// get address
 		Address := ReadCString(msg.Data)
 		// convert address and port to human readable string
