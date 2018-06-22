@@ -1,12 +1,12 @@
 package milter
 
-/* Message represents commant sent from milter client */
+// Message represents a command sent from milter client
 type Message struct {
 	Code byte
 	Data []byte
 }
 
-/* Define milter response codes */
+// Define milter response codes
 const (
 	Accept   = 'a'
 	Continue = 'c'

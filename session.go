@@ -30,7 +30,7 @@ const (
 	OptNoEOH      = 0x40
 )
 
-/* MilterSession is keeps session state during MTA communication */
+// MilterSession keeps session state during MTA communication
 type MilterSession struct {
 	Actions  uint32
 	Protocol uint32
@@ -40,7 +40,7 @@ type MilterSession struct {
 	Milter   Milter
 }
 
-/* ReadPacket reads incoming milter packet */
+// ReadPacket reads incoming milter packet
 func (c *MilterSession) ReadPacket() (*Message, error) {
 	// read packet length
 	var length uint32
@@ -63,7 +63,7 @@ func (c *MilterSession) ReadPacket() (*Message, error) {
 	return &message, nil
 }
 
-/* WritePacket sends a milter response packet to socket stream */
+// WritePacket sends a milter response packet to socket stream
 func (m *MilterSession) WritePacket(msg *Message) error {
 	buffer := bufio.NewWriter(m.Sock)
 
@@ -91,7 +91,7 @@ func (m *MilterSession) WritePacket(msg *Message) error {
 	return nil
 }
 
-/* Process incoming milter command */
+// Process processes incoming milter commands
 func (m *MilterSession) Process(msg *Message) (Response, error) {
 	switch msg.Code {
 	case 'A':
@@ -141,7 +141,7 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 	case 'D':
 		// define macros
 		m.Macros = make(map[string]string)
-		// convert data to golang strings
+		// convert data to Go strings
 		data := DecodeCStrings(msg.Data[1:])
 		if len(data) != 0 {
 			// store data in a map
@@ -217,7 +217,7 @@ func (m *MilterSession) Process(msg *Message) (Response, error) {
 	return RespContinue, nil
 }
 
-/* process all milter commands in the same connection */
+// HandleMilterComands processes all milter commands in the same connection
 func (m *MilterSession) HandleMilterCommands() {
 	// close session socket on exit
 	defer m.Sock.Close()
