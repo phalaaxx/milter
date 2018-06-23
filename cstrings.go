@@ -5,10 +5,10 @@ import (
 	"strings"
 )
 
-/* NULL terminator */
+// NULL terminator
 const NULL = "\x00"
 
-/* DecodeCStrings splits c style strings into golang slice */
+// DecodeCStrings splits a C style strings into a Go slice
 func DecodeCStrings(data []byte) []string {
 	if len(data) == 0 {
 		return nil
@@ -16,7 +16,7 @@ func DecodeCStrings(data []byte) []string {
 	return strings.Split(strings.Trim(string(data), NULL), NULL)
 }
 
-/* ReadCString reads and returs c style string from []byte */
+// ReadCString reads and returns a C style string from []byte
 func ReadCString(data []byte) string {
 	pos := bytes.IndexByte(data, 0)
 	if pos == -1 {

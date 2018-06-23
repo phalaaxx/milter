@@ -1,13 +1,14 @@
+// A Go library for milter support
 package milter
 
 import (
 	"net"
 )
 
-/* MilterInit is a function that initializes milter object options */
+// MilterInit initializes milter options
 type MilterInit func() (Milter, uint32, uint32)
 
-/* RunServer provides a convinient way to start milter server */
+// RunServer provides a convenient way to start a milter server
 func RunServer(server net.Listener, init MilterInit) error {
 	for {
 		// accept connection from client
