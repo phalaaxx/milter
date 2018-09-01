@@ -18,11 +18,11 @@ func RunServer(server net.Listener, init MilterInit) error {
 		}
 		// create milter object
 		milter, actions, protocol := init()
-		session := MilterSession{
-			Actions:  actions,
-			Protocol: protocol,
-			Sock:     client,
-			Milter:   milter,
+		session := milterSession{
+			actions:  actions,
+			protocol: protocol,
+			sock:     client,
+			milter:   milter,
 		}
 		// handle connection commands
 		go session.HandleMilterCommands()
