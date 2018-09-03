@@ -8,9 +8,9 @@ type Message struct {
 
 // Define milter response codes
 const (
-	Accept   = 'a'
-	Continue = 'c'
-	Discard  = 'd'
-	Reject   = 'r'
-	TempFail = 't'
+	accept    = 'a'
+	continue_ = 'c'
+	discard   = 'd'
+	reject    = 'r'
+	tempFail  = 't'
 )
