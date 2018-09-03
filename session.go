@@ -11,23 +11,31 @@ import (
 	"strings"
 )
 
-const (
-	// negotiation actions
-	OptAddHeader    = 0x01
-	OptChangeBody   = 0x02
-	OptAddRcpt      = 0x04
-	OptRemoveRcpt   = 0x08
-	OptChangeHeader = 0x10
-	OptQuarantine   = 0x20
+// OptAction sets which actions the milter wants to perform.
+// Multiple options can be set using a bitmask.
+type OptAction uint32
 
-	// undesired protocol content
-	OptNoConnect  = 0x01
-	OptNoHelo     = 0x02
-	OptNoMailFrom = 0x04
-	OptNoRcptTo   = 0x08
-	OptNoBody     = 0x10
-	OptNoHeaders  = 0x20
-	OptNoEOH      = 0x40
+// OptProtocol masks out unwanted parts of the SMTP transaction.
+// Multiple options can be set using a bitmask.
+type OptProtocol uint32
+
+const (
+	// set which actions the milter wants to perform
+	OptAddHeader    OptAction = 0x01
+	OptChangeBody   OptAction = 0x02
+	OptAddRcpt      OptAction = 0x04
+	OptRemoveRcpt   OptAction = 0x08
+	OptChangeHeader OptAction = 0x10
+	OptQuarantine   OptAction = 0x20
+
+	// mask out unwanted parts of the SMTP transaction
+	OptNoConnect  OptProtocol = 0x01
+	OptNoHelo     OptProtocol = 0x02
+	OptNoMailFrom OptProtocol = 0x04
+	OptNoRcptTo   OptProtocol = 0x08
+	OptNoBody     OptProtocol = 0x10
+	OptNoHeaders  OptProtocol = 0x20
+	OptNoEOH      OptProtocol = 0x40
 )
 
 // milterSession keeps session state during MTA communication

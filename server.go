@@ -6,7 +6,8 @@ import (
 )
 
 // MilterInit initializes milter options
-type MilterInit func() (Milter, uint32, uint32)
+// multiple options can be set using a bitmask
+type MilterInit func() (Milter, OptAction, OptProtocol)
 
 // RunServer provides a convenient way to start a milter server
 func RunServer(server net.Listener, init MilterInit) error {
