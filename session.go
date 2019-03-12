@@ -227,8 +227,12 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 
 // HandleMilterComands processes all milter commands in the same connection
 func (m *milterSession) HandleMilterCommands() {
-	// close session socket on exit
+
 	defer m.sock.Close()
+	defer m.milter.Disconnect()
+
+	// Call Init() for a new Session first
+	m.milter.Init()
 
 	for {
 		// ReadPacket
@@ -239,7 +243,6 @@ func (m *milterSession) HandleMilterCommands() {
 			}
 			return
 		}
-
 		// process command
 		resp, err := m.Process(msg)
 		if err != nil {
@@ -257,11 +260,12 @@ func (m *milterSession) HandleMilterCommands() {
 				log.Printf("Error writing packet: %v", err)
 				return
 			}
-
-			if !resp.Continue() {
-				return
-			}
-
+		}
+		if msg.Code == 'A' || msg.Code == 'E' {
+			// on SMFIC_ABORT or SMFIC_BODYEOB
+			// Reset state to before SMFIC_MAIL and continue,
+			// unless connection is dropped by MTA
+			m.milter.Init()
 		}
 	}
 }
