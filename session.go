@@ -128,6 +128,9 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 			}
 			Port = binary.BigEndian.Uint16(msg.Data)
 			msg.Data = msg.Data[2:]
+			if protocolFamily == '6' {
+				msg.Data = msg.Data[5:] // ipv6 is in format IPv6:XXX:XX1
+			}
 		}
 		// get address
 		Address := readCString(msg.Data)
