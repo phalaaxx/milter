@@ -47,7 +47,7 @@ func TestRunServer(t *testing.T) {
 	listener := &mocListener{Listener: ln}
 
 	go func(address string) {
-		time.Sleep(time.Second)
+		time.Sleep(10 * time.Millisecond)
 		cli, err := net.Dial("tcp4", address)
 		if err != nil {
 			t.Errorf("Dial %s", err)
