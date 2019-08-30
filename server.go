@@ -1,4 +1,4 @@
-// A Go library for milter support
+// Package milter A Go library for milter support
 package milter
 
 import (

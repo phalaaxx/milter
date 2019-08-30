@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 	"log"
 	"net"
@@ -20,13 +21,18 @@ type OptAction uint32
 type OptProtocol uint32
 
 const (
-	// set which actions the milter wants to perform
-	OptAddHeader    OptAction = 0x01
-	OptChangeBody   OptAction = 0x02
-	OptAddRcpt      OptAction = 0x04
-	OptRemoveRcpt   OptAction = 0x08
+	// OptAddHeader allow Add headers
+	OptAddHeader OptAction = 0x01
+	// OptChangeBody allow milter to rewrite email body
+	OptChangeBody OptAction = 0x02
+	// OptAddRcpt allow milter to add recipients
+	OptAddRcpt OptAction = 0x04
+	// OptRemoveRcpt allow milter to remove recipients
+	OptRemoveRcpt OptAction = 0x08
+	// OptChangeHeader allow milter to change or delete headers
 	OptChangeHeader OptAction = 0x10
-	OptQuarantine   OptAction = 0x20
+	// OptQuarantine allow milter to quarantine a message
+	OptQuarantine OptAction = 0x20
 
 	// mask out unwanted parts of the SMTP transaction
 	OptNoConnect  OptProtocol = 0x01
@@ -36,6 +42,11 @@ const (
 	OptNoBody     OptProtocol = 0x10
 	OptNoHeaders  OptProtocol = 0x20
 	OptNoEOH      OptProtocol = 0x40
+)
+
+var (
+	errCloseSession = errors.New("Stop current milter processing")
+	errMacroNoData  = errors.New("Macro definition with no data")
 )
 
 // milterSession keeps session state during MTA communication
@@ -208,7 +219,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 
 	case 'Q':
 		// client requested session close
-		return nil, eCloseSession
+		return nil, errCloseSession
 
 	case 'R':
 		// envelope to address
@@ -221,7 +232,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 	default:
 		// print error and close session
 		log.Printf("Unrecognized command code: %c", msg.Code)
-		return nil, eCloseSession
+		return nil, errCloseSession
 	}
 
 	// by default continue with next milter message
@@ -246,7 +257,7 @@ func (m *milterSession) HandleMilterCommands() {
 		// process command
 		resp, err := m.Process(msg)
 		if err != nil {
-			if err != eCloseSession {
+			if err != errCloseSession {
 				// log error condition
 				log.Printf("Error performing milter command: %v", err)
 			}
