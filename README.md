@@ -1,4 +1,4 @@
-[![Travis Status](https://travis-ci.com/ubogdan/milter.svg?branch=master)](https://travis-ci.org/ubogdan/license)
+[![Travis Status](https://travis-ci.com/ubogdan/milter.svg?branch=master)](https://travis-ci.org/ubogdan/milter)
 [![Code Coverage](https://codecov.io/gh/ubogdan/milter/branch/master/graph/badge.svg)](https://codecov.io/gh/ubogdan/milter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ubogdan/milter)](https://goreportcard.com/report/github.com/ubogdan/milter)
 [![GoDoc](https://godoc.org/github.com/ubogdan/milter?status.svg)](https://godoc.org/github.com/ubogdan/milter)
