@@ -5,8 +5,11 @@ import (
 	"encoding/binary"
 	"io"
 	"net"
+	"net/textproto"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMilterSession_ReadPacket(t *testing.T) {
@@ -102,25 +105,124 @@ func TestMilterSession_ReadWrite(t *testing.T) {
 
 }
 
-func TestMilterSession_Process(t *testing.T) {
-	sess := &milterSession{}
+type mocSession struct {
+	Milter
+}
 
-	_, err := sess.Process(SimpleResponse('A').Response())
-	if err != nil {
-		t.Errorf("Unexpected Process %s", err)
+func (moc *mocSession) Connect(host string, family string, port uint16, addr net.IP, m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+
+func (moc *mocSession) Helo(name string, m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+
+func (moc *mocSession) MailFrom(from string, m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+
+func (moc *mocSession) RcptTo(rcptTo string, m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+
+func (moc *mocSession) Header(name string, value string, m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+
+func (moc *mocSession) Headers(h textproto.MIMEHeader, m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+
+func (moc *mocSession) BodyChunk(chunk []byte, m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+func (moc *mocSession) Body(m *Modifier) (Response, error) {
+	return RespContinue, nil
+}
+
+func TestMilterSession_Process(t *testing.T) {
+
+	sess := &milterSession{
+		milter: &mocSession{},
 	}
-	/*
-		_,err = sess.Process(SimpleResponse('B').Response())
-		if err != nil {
-			t.Errorf("Unexpected Process %s", err)
+	tests := []struct {
+		Message    *Message
+		ShouldFail bool
+	}{
+		{
+			Message:    SimpleResponse('A').Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    SimpleResponse('B').Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    NewResponse('C', []byte("server.domain.com\x004\x00\x01\x01127.0.0.1\x00")).Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    NewResponse('C', []byte("server.domain.com\x004\x00")).Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    NewResponse('C', []byte("server.domain.com\x006\x00\x01\x01IPv6:2001:db8:1234:ffff:ffff:ffff:ffff:ffff")).Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    NewResponse('D', []byte("key\x00value\x00")).Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    SimpleResponse('E').Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    NewResponse('H', []byte("mail.domain.com\x00")).Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    NewResponse('L', []byte("From\x00user@domain.com\x00")).Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    NewResponse('M', []byte("user@domain.com\x00")).Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    SimpleResponse('N').Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    SimpleResponse('O').Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    SimpleResponse('Q').Response(),
+			ShouldFail: true,
+		},
+		{
+			Message:    SimpleResponse('R').Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    SimpleResponse('T').Response(),
+			ShouldFail: false,
+		},
+		{
+			Message:    SimpleResponse('Z').Response(),
+			ShouldFail: true,
+		},
+	}
+
+	for _, test := range tests {
+		_, err := sess.Process(test.Message)
+		if test.ShouldFail {
+			assert.Error(t, err)
+		} else {
+			assert.NoError(t, err)
 		}
-	*/
-	/*
-		_,err = sess.Process(SimpleResponse('C').Response())
-		if err != nil {
-			t.Errorf("Unexpected Process %s", err)
-		}
-	*/
+	}
 
 }
 
