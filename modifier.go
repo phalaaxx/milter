@@ -20,14 +20,12 @@ type Modifier struct {
 
 // AddRecipient appends a new envelope recipient for current message
 func (m *Modifier) AddRecipient(r string) error {
-	data := []byte(fmt.Sprintf("<%s>", r) + null)
-	return m.writePacket(NewResponse('+', data).Response())
+	return m.writePacket(NewResponseStr('+', fmt.Sprintf("<%s>", r)).Response())
 }
 
 // DeleteRecipient removes an envelope recipient address from message
 func (m *Modifier) DeleteRecipient(r string) error {
-	data := []byte(fmt.Sprintf("<%s>", r) + null)
-	return m.writePacket(NewResponse('-', data).Response())
+	return m.writePacket(NewResponseStr('-', fmt.Sprintf("<%s>", r)).Response())
 }
 
 // ReplaceBody substitutes message body with provided body
@@ -43,7 +41,7 @@ func (m *Modifier) AddHeader(name, value string) error {
 
 // Quarantine a message by giving a reason to hold it
 func (m *Modifier) Quarantine(reason string) error {
-	return m.writePacket(NewResponse('q', []byte(reason+null)).Response())
+	return m.writePacket(NewResponseStr('q', reason).Response())
 }
 
 // ChangeHeader replaces the header at the specified position with a new one
