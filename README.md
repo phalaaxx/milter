@@ -4,5 +4,6 @@
 [![GoDoc](https://godoc.org/github.com/ubogdan/milter?status.svg)](https://godoc.org/github.com/ubogdan/milter)
 
 # milter
-A Go library for milter support heavily inspired from https://github.com/andybalholm/milter
-For example how to use the library see https://github.com/phalaaxx/pf-milters - postfix milter for email classification with bogofilter and blacklisting messages which contain files with executable extensions.
+A Go library for milter support heavily inspired from [andybalholm/milter](https://github.com/andybalholm/milter)
+For example how to use the library see [phalaaxx/pf-milters](https://github.com/phalaaxx/pf-milters) - postfix milter for email classification with bogofilter and blacklisting messages which contain files with executable extensions.
+

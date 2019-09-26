@@ -35,13 +35,20 @@ const (
 	OptQuarantine OptAction = 0x20
 
 	// mask out unwanted parts of the SMTP transaction
-	OptNoConnect  OptProtocol = 0x01
-	OptNoHelo     OptProtocol = 0x02
+	// OptNoConnect godoc
+	OptNoConnect OptProtocol = 0x01
+	// OptNoHelo godoc
+	OptNoHelo OptProtocol = 0x02
+	// OptNoMailFrom godoc
 	OptNoMailFrom OptProtocol = 0x04
-	OptNoRcptTo   OptProtocol = 0x08
-	OptNoBody     OptProtocol = 0x10
-	OptNoHeaders  OptProtocol = 0x20
-	OptNoEOH      OptProtocol = 0x40
+	// OptNoRcptTo godoc
+	OptNoRcptTo OptProtocol = 0x08
+	// OptNoBody godoc
+	OptNoBody OptProtocol = 0x10
+	// OptNoHeaders godoc
+	OptNoHeaders OptProtocol = 0x20
+	// OptNoHeaders godoc
+	OptNoEOH OptProtocol = 0x40
 )
 
 var (
@@ -60,16 +67,16 @@ type milterSession struct {
 }
 
 // ReadPacket reads incoming milter packet
-func (c *milterSession) ReadPacket() (*Message, error) {
+func (m *milterSession) ReadPacket() (*Message, error) {
 	// read packet length
 	var length uint32
-	if err := binary.Read(c.sock, binary.BigEndian, &length); err != nil {
+	if err := binary.Read(m.sock, binary.BigEndian, &length); err != nil {
 		return nil, err
 	}
 
 	// read packet data
 	data := make([]byte, length)
-	if _, err := io.ReadFull(c.sock, data); err != nil {
+	if _, err := io.ReadFull(m.sock, data); err != nil {
 		return nil, err
 	}
 

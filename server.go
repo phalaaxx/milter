@@ -7,10 +7,10 @@ import (
 
 // MilterInit initializes milter options
 // multiple options can be set using a bitmask
-type MilterInit func() (Milter, OptAction, OptProtocol)
+type Init func() (Milter, OptAction, OptProtocol)
 
 // RunServer provides a convenient way to start a milter server
-func RunServer(server net.Listener, init MilterInit) error {
+func RunServer(server net.Listener, init Init) error {
 	for {
 		// accept connection from client
 		client, err := server.Accept()
