@@ -245,8 +245,8 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 	return RespContinue, nil
 }
 
-// HandleMilterComands processes all milter commands in the same connection
-func (m *milterSession) HandleMilterCommands() {
+// Handle processes all milter commands in the same connection
+func (m *milterSession) Handle() {
 	// close session socket on exit
 	defer m.sock.Close()
 

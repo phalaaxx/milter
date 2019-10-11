@@ -8,23 +8,27 @@ import (
 	"time"
 )
 
-// An uninteresting service.
+// Server Milter Server
 type Server struct {
-	milter   Milter
-	actions  OptAction
-	protocol OptProtocol
+	Milter   Milter
+	Actions  OptAction
+	Protocol OptProtocol
 	doneChan chan struct{}
 	mu       sync.Mutex
 }
 
+// New return Milter Server instance
 func New(milter Milter, actions OptAction, protocol OptProtocol) *Server {
 	return &Server{
-		actions:  actions,
-		protocol: protocol,
-		milter:   milter,
+		Actions:  actions,
+		Protocol: protocol,
+		Milter:   milter,
 	}
 }
 
+// Serve accepts incoming connections on the Listener l, creating a
+// new service goroutine for each. The service goroutines read requests and
+// then call milterSession.Handler to reply to them.
 func (srv *Server) Serve(listener net.Listener) error {
 	wg := sync.WaitGroup{}
 	for {
@@ -56,20 +60,24 @@ func (srv *Server) Serve(listener net.Listener) error {
 
 		// create milter object
 		session := milterSession{
-			actions:  srv.actions,
-			protocol: srv.protocol,
+			actions:  srv.Actions,
+			protocol: srv.Protocol,
 			sock:     client,
-			milter:   srv.milter,
+			milter:   srv.Milter,
 		}
 
 		wg.Add(1)
 		go func() {
 			wg.Done()
-			session.HandleMilterCommands()
+			session.Handle()
 		}()
 	}
 }
 
+// Shutdown gracefully shuts down the server without interrupting any
+// active connections. Shutdown works by first closing all open
+// listeners, then closing all idle connections, and then waiting
+// indefinitely for connections to return to idle and then shut down.
 func (srv *Server) Shutdown() {
 	srv.mu.Lock()
 	defer srv.mu.Lock()
