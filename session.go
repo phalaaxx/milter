@@ -34,7 +34,6 @@ const (
 	// OptQuarantine allow milter to quarantine a message
 	OptQuarantine OptAction = 0x20
 
-	// mask out unwanted parts of the SMTP transaction
 	// OptNoConnect godoc
 	OptNoConnect OptProtocol = 0x01
 	// OptNoHelo godoc
@@ -47,7 +46,7 @@ const (
 	OptNoBody OptProtocol = 0x10
 	// OptNoHeaders godoc
 	OptNoHeaders OptProtocol = 0x20
-	// OptNoHeaders godoc
+	// OptNoEOH godoc
 	OptNoEOH OptProtocol = 0x40
 )
 
