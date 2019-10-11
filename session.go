@@ -13,11 +13,13 @@ import (
 )
 
 // OptAction sets which actions the milter wants to perform.
-// Multiple options can be set using a bitmask.
+// Multiple options can be set using a bitmask, which may be set by the milter in the
+// "actions" field of the SMFIC_OPTNEG response packet.
 type OptAction uint32
 
 // OptProtocol masks out unwanted parts of the SMTP transaction.
-// Multiple options can be set using a bitmask.
+// To mask out unwanted parts (saving on "over-the-wire" data  churn), the following can
+// be set in the "protocol" field of the SMFIC_OPTNEG response packet.
 type OptProtocol uint32
 
 const (
@@ -34,19 +36,21 @@ const (
 	// OptQuarantine allow milter to quarantine a message
 	OptQuarantine OptAction = 0x20
 
-	// OptNoConnect godoc
+	// OptAllEvents milter should receive all events
+	OptAllEvents OptProtocol = 0x00
+	// OptNoConnect milter not interested on SMTP Connect event
 	OptNoConnect OptProtocol = 0x01
-	// OptNoHelo godoc
+	// OptNoHelo milter not interested on SMTP Helo message
 	OptNoHelo OptProtocol = 0x02
-	// OptNoMailFrom godoc
+	// OptNoMailFrom milter not interested on email MailFrom event
 	OptNoMailFrom OptProtocol = 0x04
-	// OptNoRcptTo godoc
+	// OptNoRcptTo milter not interested on email RcptTo event
 	OptNoRcptTo OptProtocol = 0x08
-	// OptNoBody godoc
+	// OptNoBody milter not interested email Body event
 	OptNoBody OptProtocol = 0x10
-	// OptNoHeaders godoc
+	// OptNoHeaders  not interested about email Headers
 	OptNoHeaders OptProtocol = 0x20
-	// OptNoEOH godoc
+	// OptNoEOH not intererested on End of Headers
 	OptNoEOH OptProtocol = 0x40
 )
 
@@ -109,11 +113,7 @@ func (m *milterSession) WritePacket(msg *Message) error {
 	}
 
 	// flush data to network socket stream
-	if err := buffer.Flush(); err != nil {
-		return err
-	}
-
-	return nil
+	return buffer.Flush()
 }
 
 // Process processes incoming milter commands
