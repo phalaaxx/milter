@@ -13,7 +13,8 @@ func decodeCStrings(data []byte) []string {
 	if len(data) == 0 {
 		return nil
 	}
-	return strings.Split(strings.Trim(string(data), null), null)
+	str := strings.Split(string(data), null)
+	return str[:len(str)-1]
 }
 
 // ReadCString reads and returns a C style string from []byte

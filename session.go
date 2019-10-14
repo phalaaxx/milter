@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 	"log"
 	"net"
@@ -12,30 +13,50 @@ import (
 )
 
 // OptAction sets which actions the milter wants to perform.
-// Multiple options can be set using a bitmask.
+// Multiple options can be set using a bitmask, which may be set by the milter in the
+// "actions" field of the SMFIC_OPTNEG response packet.
 type OptAction uint32
 
 // OptProtocol masks out unwanted parts of the SMTP transaction.
-// Multiple options can be set using a bitmask.
+// To mask out unwanted parts (saving on "over-the-wire" data  churn), the following can
+// be set in the "protocol" field of the SMFIC_OPTNEG response packet.
 type OptProtocol uint32
 
 const (
-	// set which actions the milter wants to perform
-	OptAddHeader    OptAction = 0x01
-	OptChangeBody   OptAction = 0x02
-	OptAddRcpt      OptAction = 0x04
-	OptRemoveRcpt   OptAction = 0x08
+	// OptAddHeader allow Add headers
+	OptAddHeader OptAction = 0x01
+	// OptChangeBody allow milter to rewrite email body
+	OptChangeBody OptAction = 0x02
+	// OptAddRcpt allow milter to add recipients
+	OptAddRcpt OptAction = 0x04
+	// OptRemoveRcpt allow milter to remove recipients
+	OptRemoveRcpt OptAction = 0x08
+	// OptChangeHeader allow milter to change or delete headers
 	OptChangeHeader OptAction = 0x10
-	OptQuarantine   OptAction = 0x20
+	// OptQuarantine allow milter to quarantine a message
+	OptQuarantine OptAction = 0x20
 
-	// mask out unwanted parts of the SMTP transaction
-	OptNoConnect  OptProtocol = 0x01
-	OptNoHelo     OptProtocol = 0x02
+	// OptAllEvents milter should receive all events
+	OptAllEvents OptProtocol = 0x00
+	// OptNoConnect milter not interested on SMTP Connect event
+	OptNoConnect OptProtocol = 0x01
+	// OptNoHelo milter not interested on SMTP Helo message
+	OptNoHelo OptProtocol = 0x02
+	// OptNoMailFrom milter not interested on email MailFrom event
 	OptNoMailFrom OptProtocol = 0x04
-	OptNoRcptTo   OptProtocol = 0x08
-	OptNoBody     OptProtocol = 0x10
-	OptNoHeaders  OptProtocol = 0x20
-	OptNoEOH      OptProtocol = 0x40
+	// OptNoRcptTo milter not interested on email RcptTo event
+	OptNoRcptTo OptProtocol = 0x08
+	// OptNoBody milter not interested email Body event
+	OptNoBody OptProtocol = 0x10
+	// OptNoHeaders  not interested about email Headers
+	OptNoHeaders OptProtocol = 0x20
+	// OptNoEOH not intererested on End of Headers
+	OptNoEOH OptProtocol = 0x40
+)
+
+var (
+	errCloseSession = errors.New("Stop current milter processing")
+	errMacroNoData  = errors.New("Macro definition with no data")
 )
 
 // milterSession keeps session state during MTA communication
@@ -49,16 +70,16 @@ type milterSession struct {
 }
 
 // ReadPacket reads incoming milter packet
-func (c *milterSession) ReadPacket() (*Message, error) {
+func (m *milterSession) ReadPacket() (*Message, error) {
 	// read packet length
 	var length uint32
-	if err := binary.Read(c.sock, binary.BigEndian, &length); err != nil {
+	if err := binary.Read(m.sock, binary.BigEndian, &length); err != nil {
 		return nil, err
 	}
 
 	// read packet data
 	data := make([]byte, length)
-	if _, err := io.ReadFull(c.sock, data); err != nil {
+	if _, err := io.ReadFull(m.sock, data); err != nil {
 		return nil, err
 	}
 
@@ -92,11 +113,7 @@ func (m *milterSession) WritePacket(msg *Message) error {
 	}
 
 	// flush data to network socket stream
-	if err := buffer.Flush(); err != nil {
-		return err
-	}
-
-	return nil
+	return buffer.Flush()
 }
 
 // Process processes incoming milter commands
@@ -208,7 +225,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 
 	case 'Q':
 		// client requested session close
-		return nil, eCloseSession
+		return nil, errCloseSession
 
 	case 'R':
 		// envelope to address
@@ -221,15 +238,15 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 	default:
 		// print error and close session
 		log.Printf("Unrecognized command code: %c", msg.Code)
-		return nil, eCloseSession
+		return nil, errCloseSession
 	}
 
 	// by default continue with next milter message
 	return RespContinue, nil
 }
 
-// HandleMilterComands processes all milter commands in the same connection
-func (m *milterSession) HandleMilterCommands() {
+// Handle processes all milter commands in the same connection
+func (m *milterSession) Handle() {
 	// close session socket on exit
 	defer m.sock.Close()
 
@@ -246,7 +263,7 @@ func (m *milterSession) HandleMilterCommands() {
 		// process command
 		resp, err := m.Process(msg)
 		if err != nil {
-			if err != eCloseSession {
+			if err != errCloseSession {
 				// log error condition
 				log.Printf("Error performing milter command: %v", err)
 			}
