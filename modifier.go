@@ -61,7 +61,7 @@ func (m *Modifier) ChangeHeader(index int, name, value string) error {
 }
 
 // newModifier creates a new Modifier instance from milterSession
-func newModifier(s *milterSession) *Modifier {
+func newModifier(s *session) *Modifier {
 	return &Modifier{
 		Macros:      s.macros,
 		Headers:     s.headers,

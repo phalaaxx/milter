@@ -33,7 +33,7 @@ func (m mocListener) Addr() net.Addr {
 
 func TestRunServer(t *testing.T) {
 
-	server := New(&mocMilter{}, OptAddHeader, OptNoConnect|OptNoHelo|OptNoMailFrom|OptNoRcptTo)
+	server := New(func() Milter { return &mocMilter{} }, OptAddHeader, OptNoConnect|OptNoHelo|OptNoMailFrom|OptNoRcptTo)
 
 	ln, err := net.Listen("tcp4", "127.0.0.1:")
 	if err != nil {
@@ -48,7 +48,7 @@ func TestRunServer(t *testing.T) {
 		if err != nil {
 			t.Errorf("Dial %s", err)
 		}
-		sess := milterSession{
+		sess := session{
 			sock: cli,
 		}
 

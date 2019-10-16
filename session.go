@@ -60,7 +60,7 @@ var (
 )
 
 // milterSession keeps session state during MTA communication
-type milterSession struct {
+type session struct {
 	actions  OptAction
 	protocol OptProtocol
 	sock     io.ReadWriteCloser
@@ -70,7 +70,7 @@ type milterSession struct {
 }
 
 // ReadPacket reads incoming milter packet
-func (m *milterSession) ReadPacket() (*Message, error) {
+func (m *session) ReadPacket() (*Message, error) {
 	// read packet length
 	var length uint32
 	if err := binary.Read(m.sock, binary.BigEndian, &length); err != nil {
@@ -93,7 +93,7 @@ func (m *milterSession) ReadPacket() (*Message, error) {
 }
 
 // WritePacket sends a milter response packet to socket stream
-func (m *milterSession) WritePacket(msg *Message) error {
+func (m *session) WritePacket(msg *Message) error {
 	buffer := bufio.NewWriter(m.sock)
 
 	// calculate and write response length
@@ -117,7 +117,7 @@ func (m *milterSession) WritePacket(msg *Message) error {
 }
 
 // Process processes incoming milter commands
-func (m *milterSession) Process(msg *Message) (Response, error) {
+func (m *session) Process(msg *Message) (Response, error) {
 	switch msg.Code {
 	case 'A':
 		// abort current message and start over
@@ -246,7 +246,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 }
 
 // Handle processes all milter commands in the same connection
-func (m *milterSession) Handle() {
+func (m *session) Handle() {
 	// close session socket on exit
 	defer m.sock.Close()
 

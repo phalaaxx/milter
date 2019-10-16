@@ -23,7 +23,7 @@ func TestMilterSession_ReadPacket(t *testing.T) {
 	buffer.Write(append([]byte{message.Code}, message.Data...))
 	go buffer.Flush()
 
-	sess := &milterSession{sock: c2}
+	sess := &session{sock: c2}
 	msg, err := sess.ReadPacket()
 	if err != nil {
 		t.Errorf("Unexpecte Error")
@@ -66,7 +66,7 @@ func TestMilterSession_WritePacket(t *testing.T) {
 		}
 	}()
 
-	sess := &milterSession{sock: c2}
+	sess := &session{sock: c2}
 	err := sess.WritePacket(message)
 	if err != nil {
 		t.Errorf("Unexpected WritePacket %s", err)
@@ -85,7 +85,7 @@ func TestMilterSession_ReadWrite(t *testing.T) {
 
 	message := RespAccept.Response()
 
-	sender := &milterSession{sock: c1}
+	sender := &session{sock: c1}
 	go func() {
 		err := sender.WritePacket(message)
 		if err != nil {
@@ -93,7 +93,7 @@ func TestMilterSession_ReadWrite(t *testing.T) {
 		}
 	}()
 
-	receiver := &milterSession{sock: c2}
+	receiver := &session{sock: c2}
 	msg, err := receiver.ReadPacket()
 	if err != nil {
 		t.Errorf("Unexpected ReadPacket %s", err)
@@ -142,7 +142,7 @@ func (moc *mocSession) Body(m *Modifier) (Response, error) {
 
 func TestMilterSession_Process(t *testing.T) {
 
-	sess := &milterSession{
+	sess := &session{
 		milter: &mocSession{},
 	}
 	tests := []struct {

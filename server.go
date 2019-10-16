@@ -10,19 +10,21 @@ import (
 
 // Server Milter Server
 type Server struct {
-	Milter   Milter
-	Actions  OptAction
-	Protocol OptProtocol
-	doneChan chan struct{}
-	mu       sync.Mutex
+	NewMilter NewMilter
+	Actions   OptAction
+	Protocol  OptProtocol
+	doneChan  chan struct{}
+	mu        sync.Mutex
 }
 
+type NewMilter func() Milter
+
 // New return Milter Server instance
-func New(milter Milter, actions OptAction, protocol OptProtocol) *Server {
+func New(newMilter NewMilter, actions OptAction, protocol OptProtocol) *Server {
 	return &Server{
-		Actions:  actions,
-		Protocol: protocol,
-		Milter:   milter,
+		Actions:   actions,
+		Protocol:  protocol,
+		NewMilter: newMilter,
 	}
 }
 
@@ -59,11 +61,11 @@ func (srv *Server) Serve(listener net.Listener) error {
 		}
 
 		// create milter object
-		session := milterSession{
+		session := session{
 			actions:  srv.Actions,
 			protocol: srv.Protocol,
 			sock:     client,
-			milter:   srv.Milter,
+			milter:   srv.NewMilter(),
 		}
 
 		wg.Add(1)
