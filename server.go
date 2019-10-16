@@ -82,7 +82,7 @@ func (srv *Server) Serve(listener net.Listener) error {
 // indefinitely for connections to return to idle and then shut down.
 func (srv *Server) Shutdown() {
 	srv.mu.Lock()
-	defer srv.mu.Lock()
+	defer srv.mu.Unlock()
 
 	ch := srv.getDoneChanLocked()
 	select {
