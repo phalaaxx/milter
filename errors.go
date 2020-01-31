@@ -6,6 +6,6 @@ import (
 
 // pre-defined errors
 var (
-	eCloseSession = errors.New("Stop current milter processing")
-	eMacroNoData  = errors.New("Macro definition with no data")
+	errCloseSession = errors.New("Stop current milter processing")
+	errMacroNoData  = errors.New("Macro definition with no data")
 )
