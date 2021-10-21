@@ -38,4 +38,12 @@ type Milter interface {
 	// Body is called at the end of each message
 	//   all changes to message's content & attributes must be done here
 	Body(m *Modifier) (Response, error)
+
+	// Abort is called with SMFIC_ABORT
+	//   Abort current filter checks
+	Abort()
+
+	// Quit is called with SMFIC_QUIT
+	//   Quit milter communication
+	Quit()
 }

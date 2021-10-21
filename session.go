@@ -107,6 +107,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 		// abort current message and start over
 		m.headers = nil
 		m.macros = nil
+		m.milter.Abort()
 		// do not send response
 		return nil, nil
 
@@ -212,6 +213,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 		return NewResponse('O', buffer.Bytes()), nil
 
 	case 'Q':
+		m.milter.Quit()
 		// client requested session close
 		return nil, errCloseSession
 
