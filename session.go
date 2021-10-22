@@ -105,9 +105,11 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 	switch msg.Code {
 	case 'A':
 		// abort current message and start over
+		if m.milter.Abort != nil {
+			m.milter.Abort(newModifier(m))
+		}
 		m.headers = nil
 		m.macros = nil
-		m.milter.Abort()
 		// do not send response
 		return nil, nil
 
@@ -213,7 +215,9 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 		return NewResponse('O', buffer.Bytes()), nil
 
 	case 'Q':
-		m.milter.Quit()
+		if m.milter.Quit != nil {
+			m.milter.Quit(newModifier(m))
+		}
 		// client requested session close
 		return nil, errCloseSession
 

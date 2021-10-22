@@ -41,9 +41,9 @@ type Milter interface {
 
 	// Abort is called with SMFIC_ABORT
 	//   Abort current filter checks
-	Abort()
+	Abort(m *Modifier)
 
 	// Quit is called with SMFIC_QUIT
 	//   Quit milter communication
-	Quit()
+	Quit(m *Modifier)
 }
