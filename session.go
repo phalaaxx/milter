@@ -108,7 +108,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 			defer func() {
 				if r := recover(); r != nil { }
 			}()
-			m.milter.Abort()
+			m.milter.Abort(newModifier(m))
 		}()
 		// abort current message and start over
 		m.headers = nil
@@ -222,7 +222,7 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 			defer func() {
 				if r := recover(); r != nil { }
 			}()
-			m.milter.Quit()
+			m.milter.Quit(newModifier(m))
 		}()
 		// client requested session close
 		return nil, errCloseSession
