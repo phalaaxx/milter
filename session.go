@@ -104,13 +104,13 @@ func (m *milterSession) WritePacket(msg *Message) error {
 func (m *milterSession) Process(msg *Message) (Response, error) {
 	switch msg.Code {
 	case 'A':
-		defer func() {
-			if r := recover(); r != nil {
-				println(r)
-			}
+		func() {
+			defer func() {
+				if r := recover(); r != nil { }
+			}()
+			m.milter.Abort()
 		}()
 		// abort current message and start over
-		m.milter.Abort(newModifier(m))
 		m.headers = nil
 		m.macros = nil
 		// do not send response
@@ -218,12 +218,12 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 		return NewResponse('O', buffer.Bytes()), nil
 
 	case 'Q':
-		defer func() {
-			if r := recover(); r != nil {
-				println(r)
-			}
+		func() {
+			defer func() {
+				if r := recover(); r != nil { }
+			}()
+			m.milter.Quit()
 		}()
-		m.milter.Quit(newModifier(m))
 		// client requested session close
 		return nil, errCloseSession
 
