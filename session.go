@@ -184,10 +184,14 @@ func (m *milterSession) Process(msg *Message) (Response, error) {
 		}
 		// add new header to headers map
 		HeaderData := decodeCStrings(msg.Data)
-		if len(HeaderData) == 2 {
-			m.headers.Add(HeaderData[0], HeaderData[1])
+		if len(HeaderData) != 0 {
+			headerDataStr := ""
+			if len(HeaderData) == 2 {
+				headerDataStr = HeaderData[1]
+			}
+			m.headers.Add(HeaderData[0], headerDataStr)
 			// call and return milter handler
-			return m.milter.Header(HeaderData[0], HeaderData[1], newModifier(m))
+			return m.milter.Header(HeaderData[0], headerDataStr, newModifier(m))
 		}
 
 	case 'M':
